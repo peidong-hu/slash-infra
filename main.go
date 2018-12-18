@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile)
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("could not load .env file", err)

@@ -2,6 +2,7 @@ package slackutil
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -13,6 +14,7 @@ func VerifyRequestSignature(secret string, next http.Handler) http.HandlerFunc {
 		bodyBytes, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			bugsnag.Notify(err)
+			fmt.Println("in middleware")
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Bad request"))
 			return
