@@ -87,7 +87,7 @@ func (h httpServer) whatIsHandler(w http.ResponseWriter, r *http.Request, ps htt
 
 	findResources := slackutil.DelayedSlashResponse{
 		PendingResponse: slackutil.Response{
-			Text: "One second while we look that up...",
+			Text: "Hang on a jiffy while we look that up...",
 		},
 
 		Handler: func(ctx context.Context, req slackutil.SlashCommandRequest, resp slackutil.MessageResponder) {
@@ -110,6 +110,8 @@ func (h httpServer) whatIsHandler(w http.ResponseWriter, r *http.Request, ps htt
 			resp.PublicResponse(response)
 
 		},
+
+		ShowSlashCommandInChannel: true,
 	}
 
 	findResources.Run(w, *command)
