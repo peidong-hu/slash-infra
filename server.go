@@ -33,6 +33,37 @@ func respondWithError(w http.ResponseWriter, statusCode int, msg string) {
 }
 
 func FormatEc2InstanceAsAttachment(instance search.Result) slackutil.Attachment {
+	fields := []slackutil.Field{
+		slackutil.Field{
+			Title: "Environment",
+			Value: instance.GetMetadata("tag:Environment"),
+			Short: true,
+		},
+		slackutil.Field{
+			Title: "Role",
+			Value: instance.GetMetadata("tag:Role"),
+			Short: true,
+		},
+	}
+
+	if publicIps := instance.GetMetadata("public_ips"); publicIps != "" {
+		fields = append(fields, slackutil.Field{
+			Title: "Public IP(s)",
+			Value: instance.GetMetadata("public_ips"),
+			Short: true,
+		})
+	}
+	if privateIps := instance.GetMetadata("private_ips"); privateIps != "" {
+		fields = append(fields, slackutil.Field{
+			Title: "Private IP(s)",
+			Value: privateIps,
+			Short: true,
+		})
+	}
+	fields = append(fields, slackutil.Field{
+		Value: fmt.Sprintf("⏳ <%s|AWS config timeline>", instance.GetLink("config_timeline")),
+	})
+
 	return slackutil.Attachment{
 		Text: fmt.Sprintf(
 			"Instance <%s|%s> is a `%s` `%s` in `%s`",
@@ -42,31 +73,7 @@ func FormatEc2InstanceAsAttachment(instance search.Result) slackutil.Attachment 
 			instance.GetMetadata("instance_type"),
 			instance.GetMetadata("az"),
 		),
-		Fields: []slackutil.Field{
-			slackutil.Field{
-				Title: "Environment",
-				Value: instance.GetMetadata("tag:Environment"),
-				Short: true,
-			},
-			slackutil.Field{
-				Title: "Role",
-				Value: instance.GetMetadata("tag:Role"),
-				Short: true,
-			},
-			slackutil.Field{
-				Title: "Public IP(s)",
-				Value: instance.GetMetadata("public_ips"),
-				Short: true,
-			},
-			slackutil.Field{
-				Title: "Private IP(s)",
-				Value: instance.GetMetadata("private_ips"),
-				Short: true,
-			},
-			slackutil.Field{
-				Value: fmt.Sprintf("⏳ <%s|AWS config timeline>", instance.GetLink("config_timeline")),
-			},
-		},
+		Fields:     fields,
 		MarkdownIn: []string{"text"},
 	}
 }
