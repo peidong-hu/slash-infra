@@ -33,7 +33,8 @@ third party, they would only be usable for a short period of time.
 Secondly, if the credentials for the IAM user are leaked, the attacker
 will only be able to assume IAM roles. If they do not know the ARN of
 your role they will not be able to assume it, and thus won't be able to
-perform actions on your account.
+perform actions on your account. You then only need to rotate one set of
+credentials, rather credentials for all of your AWS accounts.
 
 Note that if you're using the role name suggested in these docs then
 they will likely be able to guess the full ARN, as you can always get
@@ -68,12 +69,12 @@ This IAM user should have the following permission policy:
 }
 ```
 
-Note that the `*` in the ARN allows this suser to assume the
+Note that the `*` in the ARN allows this user to assume the
 `SlashInfraInspection` role in any AWS account that:
 
 - has that role
-- has marked your AWS account ID as a "Trusted entity" in the role's
-  "Trust relationships"
+- has marked the IAM user's AWS account ID as a "Trusted entity" in the
+  role's "Trust relationships"
 
 If these are new concepts for you, I'd really recommend reading [AWS'
 documentation on IAM
