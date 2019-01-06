@@ -22,21 +22,27 @@ instance ID.
 Rather than create a user in each AWS account, the app uses a limited
 IAM user to assume roles in each AWS account that should be searched.
 
-This approach seems convoluted, but there are several benefits:
+This approach seems convoluted, but there are several benefits.
 
-- When an IAM user "assumes" a role, AWS generates a set of temporary
-  credentials for the user that have the same permissions as the role.
-  These credentials are short-lived, and are rotated transparently by
-  the AWS SDK. If these temporary credentials were to be leaked to a
-  third party, they would only be usable for a short period of time.
-- If the credentials for the IAM user are leaked, an attacker can't use
-  the credentials unless they have the ARN of a role in a specific AWS
-  account. This may not be a great comfort if the role resides in the
-  same account as the user (you can use `aws sts get-caller-identity` to
-  get the ID of the account the current credentials belong to), but
-  there's nothing in `slash-infra` that requires a specific role name -
-  you could choose a unique role name for your org, thus making it
-  slightly more difficult for an attacker to exploit.
+Firstly, when an IAM user "assumes" a role, AWS generates a set of temporary
+credentials for the user that have the same permissions as the role.
+These credentials are short-lived, and are rotated transparently by
+the AWS SDK. If these temporary credentials were leaked to a
+third party, they would only be usable for a short period of time.
+
+Secondly, if the credentials for the IAM user are leaked, the attacker
+will only be able to assume IAM roles. If they do not know the ARN of
+your role they will not be able to assume it, and thus won't be able to
+perform actions on your account.
+
+Note that if you're using the role name suggested in these docs then
+they will likely be able to guess the full ARN, as you can always get
+the ID of the AWS account credentials belong to using `aws sts
+get-caller-identity`. If this is a concern for you, you can make things
+slightly more difficult for attackers by choosing a unique name for your
+roles that are different to the name of the IAM user. `slash-infra` only
+uses the role ARN to authenticate to AWS, so you could use a different
+role name for each environment.
 
 You can configure the IAM user using the conventional environment
 variables:
