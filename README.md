@@ -16,6 +16,14 @@ problem.
 resources. Currently it only supports looking up instances by their
 instance ID.
 
+## Configuring Slack
+
+- [Create a slack app](https://api.slack.com/apps)
+- export the signing secret (from the `App Credentials` section of the
+  app's basic information) as the environment variable
+  `SLACK_SIGNING_SECRET`
+- Configure slash commands to point at the routes specified in
+  `server.go`
 
 ## Configuring AWS access
 
