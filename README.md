@@ -105,3 +105,18 @@ export AWS_REGION_PRODUCTION=eu-west-2
 
 If you need to search multiple regions within a single account you can
 create several aliases that use the same role ARN.
+
+## Testing locally
+
+Download [ngrok](http://ngrok.com), and [create a slack
+app](https://api.slack.com/apps) in your slack workspace. Create slash
+commands in the app for the commands you want to support (see server.go).
+
+## FAQ
+
+### Why not write this in a lambda?
+
+- I don't know how to write lambdas. I wrote this in 20% time and didn't
+  want to spend my day learning how to deploy lambdas
+- We don't mind spending the few $X heroku charge to run this on a hobby
+  dyno
