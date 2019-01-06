@@ -19,7 +19,7 @@ func main() {
 
 	server := makeHttpHandler()
 
-	handler := slackutil.VerifyRequestSignature(os.Getenv("SLACK_SIGNING_SECRET"), server)
+	handler := slackutil.VerifyRequestSignature(os.Getenv("SLACK_SIGNING_SECRET"))(server)
 
 	log.Fatal(http.ListenAndServe(":8090", handler))
 }
