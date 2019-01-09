@@ -5,7 +5,6 @@ resource "aws_iam_role" "slash-infra-access" {
 
 data "aws_iam_policy_document" "allow-slash-infra-account-to-assume" {
   statement {
-    id      = "1"
     actions = ["sts:AssumeRole"]
 
     principals {
