@@ -21,5 +21,10 @@ func main() {
 
 	handler := slackutil.VerifyRequestSignature(os.Getenv("SLACK_SIGNING_SECRET"))(server)
 
-	log.Fatal(http.ListenAndServe(":8090", handler))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8090"
+	}
+
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
