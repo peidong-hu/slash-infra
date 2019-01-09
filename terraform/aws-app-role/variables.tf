@@ -3,6 +3,6 @@ variable "role_name" {
   default     = "SlashInfraAccess"
 }
 
-variable "trusted_aws_account_id" {
-  description = "The ID of the account in which the AWS IAM user for slash-infra lives"
+variable "trusted_aws_account_arn" {
+  description = "The ARN of the root user of an account in which the AWS IAM user for slash-infra lives"
 }

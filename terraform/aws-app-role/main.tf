@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "allow-slash-infra-account-to-assume" {
 
     principals {
       type        = "AWS"
-      identifiers = ["${var.trusted_aws_account_id}"]
+      identifiers = ["${var.trusted_aws_account_arn}"]
     }
   }
 }
