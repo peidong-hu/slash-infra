@@ -1,0 +1,9 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: hashicorp/terraform
+    steps:
+      - checkout
+      - run: apk update && apk add colordiff --no-cache --force-refresh --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/
+      - run: cd terraform && terraform fmt -diff=true -check=true | colordiff
