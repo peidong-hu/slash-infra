@@ -13,3 +13,16 @@ data "aws_iam_policy_document" "allow-slash-infra-account-to-assume" {
     }
   }
 }
+
+resource "aws_iam_role_policy" "allow-read-only-access" {
+  name   = "allow-read-only-access"
+  role   = "${aws_iam_role.slash-infra-access.id}"
+  policy = "${data.aws_iam_policy_document.allow-read-only-access.json}"
+}
+
+data "aws_iam_policy_document" "allow-read-only-access" {
+  statement {
+    actions   = ["ec2:DescribeInstances"]
+    resources = ["*"]
+  }
+}
