@@ -17,7 +17,9 @@ func main() {
 		log.Println("could not load .env file", err)
 	}
 
-	server := makeHttpHandler()
+	awsSessions := buildAwsSessionsFromEnvironment()
+
+	server := makeHttpHandler(awsSessions)
 
 	handler := slackutil.VerifyRequestSignature(os.Getenv("SLACK_SIGNING_SECRET"))(server)
 

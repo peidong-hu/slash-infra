@@ -5,16 +5,17 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/geckoboard/slash-infra/search"
 	"github.com/geckoboard/slash-infra/slackutil"
 	"github.com/julienschmidt/httprouter"
 )
 
-func makeHttpHandler() *httprouter.Router {
+func makeHttpHandler(sessions map[string]*session.Session) *httprouter.Router {
 	router := httprouter.New()
 
 	s := httpServer{
-		ec2Resolver: search.NewEc2(),
+		ec2Resolver: search.NewEc2(sessions),
 	}
 
 	router.POST("/slack/infra-search", s.whatIsHandler)

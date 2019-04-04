@@ -4,12 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -18,69 +15,19 @@ import (
 
 // This is 17 characters plus the "i-" prefix
 const ExactEc2InstanceIDLength = 19
-const EnvVarPrefixForAwsRoles = "AWS_ROLE_"
 
 type ec2SDK interface {
 	DescribeInstancesWithContext(ctx aws.Context, input *ec2.DescribeInstancesInput, opts ...request.Option) (*ec2.DescribeInstancesOutput, error)
 }
 
-// buildEc2ClientsFromEnvironment uses environment variables to build instances
-// of the EC2 client library for each AWS account it should discover resources
-// within.
-//
-// The main variables for configuration are:
-//
-// `AWS_ROLE_{account alias}` - The role slash-infra should assume to gain access
-// to the account known as {account alias}
-//
-// `AWS_REGION_{account alias}` - If the account's resources are in a region
-// other than us-east-1, specify it here.
-//
-// If an account uses several regions, then you can specify role several times
-// under different aliases. e.g.
-//
-// ```
-// AWS_ROLE_DEV_US_EAST=...
-// AWS_ROLE_DEV_EU=...
-// ```
-func buildEc2ClientsFromEnvironment() []ec2SDK {
-	clients := []ec2SDK{}
-	environ := os.Environ()
+func NewEc2(awsSessions map[string]*session.Session) *EC2Resolver {
+	clients := make([]ec2SDK, 0)
 
-	for _, pair := range environ {
-		if !strings.HasPrefix(pair, EnvVarPrefixForAwsRoles) {
-			continue
-		}
-		parts := strings.SplitN(pair, "=", 2)
-		key := parts[0]
-		roleArn := parts[1]
-
-		awsAccountAlias := key[len(EnvVarPrefixForAwsRoles):]
-
-		// Some of our infra is not in us-east-1 (e.g. dev-vpc)
-		// Allow slash-infra to create clients that will discover resources in those regions
-		region := os.Getenv(fmt.Sprintf("AWS_REGION_%s", awsAccountAlias))
-		if region == "" {
-			region = "us-east-1"
-		}
-
-		sess := session.Must(session.NewSession(&aws.Config{
-			Credentials: credentials.NewEnvCredentials(),
-			// Setting here rather than in env variables as not all of our
-			// accounts are in us-east-1
-			Region: aws.String(region),
-		}))
-		creds := stscreds.NewCredentials(sess, roleArn)
-		svc := ec2.New(sess, &aws.Config{Credentials: creds})
-
-		clients = append(clients, svc)
+	for _, sess := range awsSessions {
+		clients = append(clients, ec2.New(sess))
 	}
 
-	return clients
-}
-
-func NewEc2() *EC2Resolver {
-	return &EC2Resolver{clients: buildEc2ClientsFromEnvironment()}
+	return &EC2Resolver{clients: clients}
 }
 
 type Result struct {
