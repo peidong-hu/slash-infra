@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/geckoboard/slash-infra/search"
 	"github.com/geckoboard/slash-infra/slackutil"
@@ -91,7 +90,6 @@ func (h httpServer) whatIsHandler(w http.ResponseWriter, r *http.Request, ps htt
 		},
 
 		Handler: func(ctx context.Context, req slackutil.SlashCommandRequest, resp slackutil.MessageResponder) {
-			time.Sleep(time.Second)
 			resultSets := h.ec2Resolver.Search(ctx, command.Text)
 
 			response := slackutil.Response{
