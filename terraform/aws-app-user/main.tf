@@ -1,10 +1,10 @@
 resource "aws_iam_user" "app-user" {
-  name = "${var.username}"
+  name = var.username
 }
 
 resource "aws_iam_user_policy" "allow-assuming-slash-infra-roles" {
   name = "allow-assuming-slash-infra-roles"
-  user = "${aws_iam_user.app-user.name}"
+  user = aws_iam_user.app-user.name
 
   policy = <<EOF
 {
