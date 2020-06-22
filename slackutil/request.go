@@ -40,6 +40,37 @@ type SlashCommandRequest struct {
 }
 
 func ParseSlashCommandRequest(r *http.Request) (*SlashCommandRequest, error) {
+	var input []byte
+
+	if r.Body != nil {
+		defer r.Body.Close()
+		body, _ := ioutil.ReadAll(r.Body)
+
+		input = body
+	}
+	var query *url.Values
+	if len(input) > 0 {
+		q, err := url.ParseQuery(string(input))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		query = &q
+	}
+	return &SlashCommandRequest{
+		Command:        query.Get("command"),
+		TeamID:         query.Get("team_id"),
+		TeamDomain:     query.Get("team_domain"),
+		EnterpriseID:   query.Get("enterprise_id"),
+		EnterpriseName: query.Get("enterprise_name"),
+		ChannelID:      query.Get("channel_id"),
+		ChannelName:    query.Get("channel_name"),
+		UserID:         query.Get("user_id"),
+		UserName:       query.Get("user_name"),
+		Text:           query.Get("text"),
+		ResponseURL:    query.Get("response_url"),
+		TriggerID:      query.Get("trigger_id"),
+	}, nil
 	if err := r.ParseForm(); err != nil {
 		return nil, err
 	}
